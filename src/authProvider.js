@@ -10,19 +10,13 @@ async function getToken() {
   return window.localStorage.getItem(localStorageKey)
 }
 
-const handleUserResponse = ({user}) => {
-  window.localStorage.setItem(localStorageKey, user.token)
-  return user
-}
-
 const register = (data) => {
-  return client('register', data) //.then(handleUserResponse)
+  return client('register', data)
 }
 
 // an auth provider wouldn't use your client, they'd have their own
 // so that's why we're not just re-using the client
 // const authURL = process.env.REACT_APP_AUTH_URL
-const authURL = "#"
 
 async function client(endpoint, data) {
   const config = {
