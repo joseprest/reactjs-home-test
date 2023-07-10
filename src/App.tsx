@@ -30,7 +30,6 @@ function App() {
   const [cityOptions, setCityOptions] = useState([]);
   useEffect(() => {
     const noToken = nonExistToken();
-    console.log("noToken: ", noToken);
     if (noToken)
       getAccessApiToken().then(() =>
         getRegionStates().then((data) => {
@@ -42,7 +41,6 @@ function App() {
     else
       getRegionStates().then((data) => {
         setStateOptions(data);
-        console.log(data[0])
         setState(data[0]["state_name"]);
       },
       err => alert("Error occured!" + err.message)

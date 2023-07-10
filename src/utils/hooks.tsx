@@ -64,7 +64,6 @@ const useAsync = (initialState?: any) => {
     [safeSetState, setData, setError],
   )
 
-  console.log("status:", status)
   return {
     // using the same names that react-query uses for convenience
     isIdle: status === 'idle',

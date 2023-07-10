@@ -8,7 +8,6 @@ const token = process.env.REACT_APP_UNIVERSAL_API_TOKEN;
 const email = process.env.REACT_APP_UNIVERSAL_EMAIL;
 
 export const getAccessApiToken = async () => {
-  console.log("get token")
   await client(AccessTokenUrl, {
     headers: {
       "api-token": `${token}`,  
@@ -16,13 +15,11 @@ export const getAccessApiToken = async () => {
       "user-email": email,
     },
   }).then( async ({auth_token}) =>{
-    console.log("set token by getAccessToken")
     await setValue(AccessTokenKey, auth_token)});
 };
 
 export const getRegionStates = async () => {
   const authToken = getValue("__access_api_token__");
-  console.log("get state api")
   return await client(StateURL, { token: authToken });
 };
 

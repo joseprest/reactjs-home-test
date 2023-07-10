@@ -32,7 +32,6 @@ async function client(endpoint, data) {
   }
 
   console.log("Signup POST Request Body - JSON", data)
-  return Promise.reject({message: 'Error!'})
 }
 
 export {getToken, register, localStorageKey}
