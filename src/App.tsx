@@ -8,16 +8,19 @@ import { register } from "./authProvider";
 import { useAsync } from "./utils/hooks";
 import FormInput from "./components/FormInput";
 import FormSelect from "./components/FormSelect";
-import { client } from "./utils/ApiClient";
-import { getAccessApiToken, getToken } from "./accessProvider";
+import {
+  getRegionStates,
+  getAccessApiToken,
+  getRegionCities,
+} from "./api/region";
+import { getValue } from "./utils/localStorage";
 
+const AccessTokenKey = "__access_api_token__";
 const cityUrl = "https://www.universal-tutorial.com/api/cities";
-const stateUrl = "https://www.universal-tutorial.com/api/states/United States";
-const accessTokenUrl = "https://www.universal-tutorial.com/api/getaccesstoken";
 
-const nonExistToken = async () => {
-  const token = getToken();
-  return token === "" || token === undefined;
+const nonExistToken = () => {
+  const token = getValue(AccessTokenKey);
+  return token ? false : true;
 };
 
 function App() {
@@ -26,16 +29,32 @@ function App() {
   const [stateOptions, setStateOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
   useEffect(() => {
-    nonExistToken().then(async (flag) => {
-      console.log("flag> ", flag)
-      if (flag) await getAccessApiToken(accessTokenUrl);
-      client(stateUrl).then((data) => setStateOptions(data));
-    });
+    const noToken = nonExistToken();
+    console.log("noToken: ", noToken);
+    if (noToken)
+      getAccessApiToken().then(() =>
+        getRegionStates().then((data) => {
+          setStateOptions(data);
+          setState(data[0]["state_name"]);
+        }),
+        err => alert("Error occured!" + err.message)
+      );
+    else
+      getRegionStates().then((data) => {
+        setStateOptions(data);
+        console.log(data[0])
+        setState(data[0]["state_name"]);
+      },
+      err => alert("Error occured!" + err.message)
+      );
   }, []);
 
   useEffect(() => {
     if (choosedState !== "")
-      client(`${cityUrl}/${choosedState}`).then((data) => setCityOptions(data));
+      getRegionCities(`${cityUrl}/${choosedState}`).then((data) =>
+        setCityOptions(data),
+        err => alert("Error occured!" + err.message)
+      );
   }, [choosedState]);
 
   const handleChange = (e: any) => {
@@ -65,11 +84,11 @@ function App() {
       <Form onSubmit={handleSubmit}>
         <div>
           <Label htmlFor="firstname">Firstname</Label>
-          <FormInput name="firstname" placeholder="Firstname" required />
+          <FormInput name="firstname" required />
         </div>
         <div>
           <Label htmlFor="lastname">Lastname</Label>
-          <FormInput name="lastname" placeholder="Lastname" required />
+          <FormInput name="lastname" required />
         </div>
         <div>
           <Label htmlFor="State">State</Label>
@@ -85,16 +104,11 @@ function App() {
         </div>
         <div>
           <Label htmlFor="Email">Email</Label>
-          <FormInput type="email" name="email" placeholder="Email" required />
+          <FormInput type="email" name="email" required />
         </div>
         <div>
           <Label htmlFor="password">Password</Label>
-          <FormInput
-            name="password"
-            type="password"
-            placeholder="password"
-            required
-          />
+          <FormInput name="password" type="password" required />
         </div>
         <div>
           <Btn type="submit" value="Sign up">
